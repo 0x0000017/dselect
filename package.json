@@ -42,5 +42,6 @@
     "iOS >= 12",
     "Safari >= 12",
     "not Explorer <= 11"
-  ]
+  ],
+  "main": "gulpfile.js"
 }

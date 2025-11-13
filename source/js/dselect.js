@@ -44,7 +44,7 @@ function dselectSearch(event, input, classElement, classToggler, creatable) {
     if (filterText.toLowerCase().indexOf(filterValue) > -1) {
       item.classList.remove('d-none')
       let header = item
-      while(header = header.previousElementSibling) {
+      while (header = header.previousElementSibling) {
         if (header.classList.contains('dropdown-header')) {
           header.classList.remove('d-none')
           break
@@ -145,8 +145,8 @@ function dselect(el, option = {}) {
     } else {
       const selectedOption = options[options.selectedIndex]
       return isPlaceholder(selectedOption)
-      ? `<span class="${classPlaceholder}">${selectedOption.innerHTML}</span>`
-      : selectedOption.innerHTML
+        ? `<span class="${classPlaceholder}">${selectedOption.innerHTML}</span>`
+        : selectedOption.innerHTML
     }
   }
 
@@ -163,22 +163,36 @@ function dselect(el, option = {}) {
       } else {
         const hidden = isPlaceholder(option) ? ' hidden' : ''
         const active = option.selected ? ' active' : ''
-        const disabled = el.multiple && option.selected ? ' disabled' : ''
+
+        // new: check original option.disabled or a custom data flag
+        const isDisabled = option.disabled || option.dataset.dselectDisabled === 'true'
+
+        // for multiple selects you were already disabling selected ones
+        const shouldBeDisabled = isDisabled || (el.multiple && option.selected)
+
+        const disabledAttr = shouldBeDisabled ? ' disabled' : ''
+        const onClickAttr = shouldBeDisabled
+          ? ''
+          : ` onclick="dselectUpdate(this, '${classElement}', '${classToggler}')"`
+
         const value = option.value
         const text = option.textContent
-        items.push(`<button${hidden} class="dropdown-item${active}" data-dselect-value="${value}" type="button" onclick="dselectUpdate(this, '${classElement}', '${classToggler}')"${disabled}>${text}</button>`)
+
+        items.push(
+          `<button${hidden} class="dropdown-item${active}" data-dselect-value="${value}" type="button"${onClickAttr}${disabledAttr}>${text}</button>`
+        )
       }
     }
-    items = items.join('')
-    return items
+    return items.join('')
   }
+
 
   function createDom() {
     const autoclose = el.multiple ? ' data-bs-auto-close="outside"' : ''
     const additionalClass = Array.from(el.classList).filter(className => {
       return className !== 'form-select'
-      && className !== 'form-select-sm'
-      && className !== 'form-select-lg'
+        && className !== 'form-select-sm'
+        && className !== 'form-select-lg'
     }).join(' ')
     const clearBtn = clearable && !el.multiple ? `
     <button type="button" class="btn ${classClearBtn}" title="Clear selection" onclick="dselectClear(this, '${classElement}')">

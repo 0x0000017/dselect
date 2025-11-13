@@ -151,14 +151,16 @@ function dselect(el, option = {}) {
       } else {
         const hidden = isPlaceholder(option2) ? " hidden" : "";
         const active = option2.selected ? " active" : "";
-        const disabled = el.multiple && option2.selected ? " disabled" : "";
+        const isDisabled = option2.disabled || option2.dataset.dselectDisabled === "true";
+        const shouldBeDisabled = isDisabled || el.multiple && option2.selected;
+        const disabledAttr = shouldBeDisabled ? " disabled" : "";
+        const onClickAttr = shouldBeDisabled ? "" : ` onclick="dselectUpdate(this, '${classElement}', '${classToggler}')"`;
         const value = option2.value;
         const text = option2.textContent;
-        items.push(`<button${hidden} class="dropdown-item${active}" data-dselect-value="${value}" type="button" onclick="dselectUpdate(this, '${classElement}', '${classToggler}')"${disabled}>${text}</button>`);
+        items.push(`<button${hidden} class="dropdown-item${active}" data-dselect-value="${value}" type="button"${onClickAttr}${disabledAttr}>${text}</button>`);
       }
     }
-    items = items.join("");
-    return items;
+    return items.join("");
   }
   function createDom() {
     const autoclose = el.multiple ? ' data-bs-auto-close="outside"' : "";
